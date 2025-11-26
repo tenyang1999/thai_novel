@@ -130,6 +130,47 @@
             color: var(--accent-color);
         }
 
+        /* 漢堡選單按鈕 (手機版顯示) */
+        .menu-toggle {
+            display: none; /* 電腦版隱藏 */
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 201; /* 比側邊欄更高，確保可點擊 */
+            background: rgba(255,255,255,0.8);
+            border: none;
+            font-size: 1.5rem;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: var(--text-color);
+            backdrop-filter: blur(5px);
+        }
+
+        [data-theme="dark"] .menu-toggle {
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* 遮罩層 (手機版側邊欄打開時顯示) */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 199; /* 在側邊欄之下，內容之上 */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
         /* 文章樣式 */
         h1.book-title {
             text-align: center;
@@ -3070,4 +3111,5 @@ Kiran把她紧紧搂在怀里，仿佛她是世界上最珍贵的东西。
         init();
     </script>
 </body>
+
 </html>
