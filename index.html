@@ -51,7 +51,8 @@
             height: 100%;
             overflow-y: auto;
             border-right: 1px solid rgba(0,0,0,0.1);
-            z-index: 100;
+            z-index: 200; /* 提高層級 */
+            transition: transform 0.3s ease; /* 添加滑動動畫 */
         }
 
         .sidebar h2 {
@@ -213,30 +214,49 @@
         /* 響應式設計 */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
+            
+            /* 手機版側邊欄樣式 */
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid rgba(0,0,0,0.1);
-                padding: 15px;
+                transform: translateX(-100%); /* 預設隱藏到左側螢幕外 */
+                width: 280px; /* 手機版稍微寬一點方便點擊 */
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             }
+
+            .sidebar.active {
+                transform: translateX(0); /* 滑入顯示 */
+            }
+
+            /* 恢復垂直列表樣式 (覆蓋之前的橫向樣式) */
             .toc-list {
-                display: flex;
-                overflow-x: auto;
-                gap: 10px;
-                padding-bottom: 5px;
+                display: block;
+                overflow-x: visible;
+                padding-bottom: 0;
             }
-            .toc-list li { min-width: 80px; text-align: center; }
-            .main-content { margin-left: 0; padding: 20px; }
-            .controls { top: auto; bottom: 20px; right: 20px; }
+            .toc-list li { 
+                text-align: left; 
+            }
+
+            .main-content { 
+                margin-left: 0; 
+                padding: 20px; 
+                padding-top: 80px; /* 留出頂部按鈕空間 */
+            }
+            
+            .controls { top: 20px; right: 20px; }
+            .menu-toggle { display: block; } /* 顯示漢堡按鈕 */
+            
             .chapter-title { font-size: 1.5rem; }
             body { font-size: 16px; }
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle" id="menuToggle" aria-label="打開目錄">☰</button>
+    <!-- 漢堡選單按鈕 -->
+    <button class="menu-toggle" id="menuToggle" title="目錄">☰</button>
+    
+    <!-- 遮罩層 -->
+    <div class="overlay" id="overlay"></div>
+
     <div class="controls">
         <button class="btn" id="decreaseFont" title="縮小字體">A-</button>
         <button class="btn" id="increaseFont" title="放大字體">A+</button>
@@ -2993,6 +3013,9 @@ Kiran把她紧紧搂在怀里，仿佛她是世界上最珍贵的东西。
         function init() {
             const contentDiv = document.getElementById('novel-content');
             const tocList = document.getElementById('toc');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
             const lines = rawText.split('\n');
             let currentChapterId = '';
             let tocHtml = '';
@@ -3026,6 +3049,30 @@ Kiran把她紧紧搂在怀里，仿佛她是世界上最珍贵的东西。
 
             contentDiv.innerHTML = contentHtml;
             tocList.innerHTML = tocHtml;
+
+            // 選單控制功能
+            function toggleMenu() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+
+            function closeMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
+            menuToggle.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', closeMenu);
+
+            // 點擊目錄連結後自動關閉選單（手機版體驗優化）
+            const tocLinks = document.querySelectorAll('.toc-list a');
+            tocLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        closeMenu();
+                    }
+                });
+            });
 
             // 恢復閱讀進度
             const savedScroll = localStorage.getItem('moonshadow_scroll');
@@ -3111,6 +3158,4 @@ Kiran把她紧紧搂在怀里，仿佛她是世界上最珍贵的东西。
         init();
     </script>
 </body>
-
 </html>
-
