@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰百小說圖書館</title>
+    <style>
+        :root {
+            --bg-color: #f7f1e3; /* 羊皮紙背景色 */
+            --text-color: #2c2c2c;
+            --accent-color: #8e44ad; /* 裝飾色 */
+            --card-bg: #fffbf0;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --font-main: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            margin-top: 60px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin: 0;
+            letter-spacing: 5px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* 書架容器 */
+        .bookshelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        /* 書籍卡片 */
+        .book-card {
+            background-color: var(--card-bg);
+            width: 280px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* 封面圖片區域 */
+        .cover-container {
+            width: 100%;
+            height: 400px; /* 固定高度，保持整齊 */
+            background-color: #ddd; /* 圖片載入前的灰色背景 */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .cover-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 確保圖片填滿且不變形 */
+            transition: transform 0.5s ease;
+        }
+
+        .book-card:hover .cover-container img {
+            transform: scale(1.05); /* 滑鼠懸停時圖片微放大 */
+        }
+
+        /* 如果沒有圖片時顯示的文字 */
+        .no-img-text {
+            position: absolute;
+            color: #666;
+            font-size: 1.2rem;
+            z-index: 1;
+        }
+
+        /* 書籍資訊 */
+        .book-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .book-title {
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .read-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 25px;
+            border: 1px solid var(--accent-color);
+            border-radius: 20px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .book-card:hover .read-btn {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* 手機版響應式 */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .cover-container { height: 350px; }
+            .book-card { width: 100%; max-width: 320px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>泰百小說</h1>
+    </header>
+
+    <div class="bookshelf">
+        
+        <a href="Moonshadow.html" class="book-card">
+            <div class="cover-container">
+                <span class="no-img-text">封面圖片</span>
+                <img src="cover_moonshadow.jpg" alt="Moonshadow 封面"> 
+            </div>
+            <div class="book-info">
+                <h2 class="book-title">Moonshadow</h2>
+                <div class="read-btn">開始閱讀</div>
+            </div>
+        </a>
+
+        <a href="Ditto.html" class="book-card">
+            <div class="cover-container">
+                <span class="no-img-text">封面圖片</span>
+                <img src="cover_ditto.jpg" alt="Ditto 封面">
+            </div>
+            <div class="book-info">
+                <h2 class="book-title">Ditto</h2>
+                <div class="read-btn">開始閱讀</div>
+            </div>
+        </a>
+
+    </div>
+
+</body>
+</html>
