@@ -6364,7 +6364,7 @@ Runch看著妻子很自然地避開一些min//g/a/n話題，忍不住笑了，�
                 } else {
                     // 正文段落
                     // 識別對話
-                    let formattedLine = line.replace(/“(.+?)”/g, '“<strong>$1</strong>”');
+                    let formattedLine = line.replace(/“(.+?)”/g, '“<strong>$1</strong>”').replace(/"(.+?)"/g, '"<strong>$1</strong>"');
                     contentHtml += `<p>${formattedLine}</p>`;
                 }
             });
