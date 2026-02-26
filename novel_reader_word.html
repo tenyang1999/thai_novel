@@ -423,12 +423,12 @@
             document.getElementById('display-author').textContent = ""; // 如果需要作者，可以在這裡擴充設定
             document.title = bookParam + " - 小說閱讀器";
 
-            // 設定路徑為 novel 資料夾下的該檔案 (不用加附檔名，程式自動補上 .docx)
-            const docxPath = `./novel/${bookParam}.docx`; 
+            // 設定路徑為 novel 資料夾下的該檔案 (不用加附檔名，程式自動補上 .txt)
+            const txtPath = `./novel/${bookParam}.txt`; 
 
             try {
                 // 使用 fetch API 取得後端的檔案
-                const response = await fetch(docxPath);
+                const response = await fetch(txtPath);
                 if (!response.ok) throw new Error('無法取得檔案，可能是檔名或路徑錯誤');
                 
                 const arrayBuffer = await response.arrayBuffer();
@@ -450,12 +450,12 @@
                     })
                     .catch(function(err) {
                         console.error("Mammoth 解析錯誤:", err);
-                        renderNovelContent("解析 Word 檔案失敗，請確保檔案格式為正確的 .docx 且沒有損毀。");
+                        renderNovelContent("解析 Word 檔案失敗，請確保檔案格式為正確的 .txt 且沒有損毀。");
                     });
             } catch (error) {
                 console.error("取得檔案失敗:", error);
                 // 如果找不到檔案，退回顯示提示文字
-                renderNovelContent(`找不到檔案：${docxPath} \n請確認 novel 資料夾內是否有此檔案，並確認伺服器有正確啟動。`);
+                renderNovelContent(`找不到檔案：${txtPath} \n請確認 novel 資料夾內是否有此檔案，並確認伺服器有正確啟動。`);
             }
         }
 
