@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月光下的陰影 - FLOWER OF MEMORY</title>
+    <style>
+        :root {
+            --bg-color: #f7f1e3; /* 羊皮紙色 */
+            --text-color: #2c2c2c;
+            --accent-color: #8e44ad; /* 月光紫 */
+            --sidebar-bg: #eae0c8;
+            --sidebar-text: #4a4a4a;
+            --font-main: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+            --font-ui: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #d1d1d1;
+            --accent-color: #a29bfe;
+            --sidebar-bg: #2d2d2d;
+            --sidebar-text: #a0a0a0;
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            line-height: 1.8;
+            font-size: 18px; /* 默認字體 */
+            overflow-x: hidden;
+        }
+
+        /* 佈局容器 */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 側邊欄 (目錄) */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0,0,0,0.1);
+            z-index: 200; /* 提高層級 */
+            transition: transform 0.3s ease; /* 添加滑動動畫 */
+        }
+
+        .sidebar h2 {
+            font-family: var(--font-ui);
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-list li {
+            margin-bottom: 8px;
+        }
+
+        .toc-list a {
+            text-decoration: none;
+            color: var(--sidebar-text);
+            font-family: var(--font-ui);
+            font-size: 0.95rem;
+            display: block;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .toc-list a:hover, .toc-list a.active {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* 主內容區 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px; /* 留出側邊欄寬度 */
+            padding: 40px 60px;
+            max-width: 900px; /* 限制閱讀寬度 */
+        }
+
+        /* 控制列 (固定在右上) */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255,255,255,0.8);
+            padding: 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            z-index: 101;
+        }
+        
+        [data-theme="dark"] .controls {
+            background: rgba(0,0,0,0.6);
+        }
+
+        .btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 50%;
+            color: var(--text-color);
+        }
+
+        .btn:hover {
+            background-color: rgba(0,0,0,0.1);
+            color: var(--accent-color);
+        }
+
+        /* 漢堡選單按鈕 (手機版顯示) */
+        .menu-toggle {
+            display: none; /* 電腦版隱藏 */
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 201; /* 比側邊欄更高，確保可點擊 */
+            background: rgba(255,255,255,0.8);
+            border: none;
+            font-size: 1.5rem;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: var(--text-color);
+            backdrop-filter: blur(5px);
+        }
+
+        [data-theme="dark"] .menu-toggle {
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* 遮罩層 (手機版側邊欄打開時顯示) */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 199; /* 在側邊欄之下，內容之上 */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 文章樣式 */
+        h1.book-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .author {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 50px;
+            opacity: 0.8;
+        }
+
+        .chapter {
+            margin-bottom: 60px;
+            padding-top: 40px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .chapter-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+            font-family: var(--font-ui);
+        }
+
+        p {
+            margin-bottom: 1.5em;
+            text-align: justify;
+        }
+
+        /* 對話強調 */
+        p:has(strong) {
+            color: var(--accent-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            
+            /* 手機版側邊欄樣式 */
+            .sidebar {
+                transform: translateX(-100%); /* 預設隱藏到左側螢幕外 */
+                width: 280px; /* 手機版稍微寬一點方便點擊 */
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* 滑入顯示 */
+            }
+
+            /* 恢復垂直列表樣式 (覆蓋之前的橫向樣式) */
+            .toc-list {
+                display: block;
+                overflow-x: visible;
+                padding-bottom: 0;
+            }
+            .toc-list li { 
+                text-align: left; 
+            }
+
+            .main-content { 
+                margin-left: 0; 
+                padding: 20px; 
+                padding-top: 80px; /* 留出頂部按鈕空間 */
+            }
+            
+            .controls { top: 20px; right: 20px; }
+            .menu-toggle { display: block; } /* 顯示漢堡按鈕 */
+            
+            .chapter-title { font-size: 1.5rem; }
+            body { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 漢堡選單按鈕 -->
+    <button class="menu-toggle" id="menuToggle" title="目錄">☰</button>
+    
+    <!-- 遮罩層 -->
+    <div class="overlay" id="overlay"></div>
+
+    <div class="controls">
+        <button class="btn" id="decreaseFont" title="縮小字體">A-</button>
+        <button class="btn" id="increaseFont" title="放大字體">A+</button>
+        <button class="btn" id="themeToggle" title="切換夜間模式">🌙</button>
+    </div>
+
+    <div class="container">
+        <nav class="sidebar" id="sidebar">
+            <h2>目錄</h2>
+            <ul class="toc-list" id="toc">
+                <!-- JS生成目錄 -->
+            </ul>
+        </nav>
+
+        <main class="main-content" id="content-area">
+            <h1 class="book-title">月光下的陰影</h1>
+            <div class="author">作者：FLOWER OF MEMORY</div>
+            
+            <!-- 小說內容開始 -->
+            <div id="novel-content">
+                <!-- 內容將由 JS 注入，並進行繁簡轉換處理 -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 原始文本 (包含全部內容)
+        const rawText = `
+更多小說更新 劇更 歡迎加入抖音群505191734855，群公告自取
+引言
+- 書籍：《月光下的陰影》
+- 作者：FLOWER OF MEMORY
+「你為什麼……把月亮紋在左胸上？」	
+「......」
+被問的人並未開口作答。相反，她嘴角浮現出一絲淡淡的微笑，銳利的雙眸閃爍著隱秘的含義，回望著對方。
+然而，這一切都發生在幾個小時之前……
+水流從淋浴噴頭傾瀉而下，順著閉目而立之人的白皙肌膚流淌。她將沐浴露擠在纖細的掌心，然後小心翼翼地塗抹在赤裸的身體上，動作細緻入微。那股慣常能帶來放鬆的溫柔香氣，此刻卻未能如往常般有效舒緩她的情緒。雙腿仍因疲憊而顫抖，敏感部位因前一晚的過度使用而感到刺痛，讓她彷彿剛從夢中醒來。然而，這一切都是美麗的現實，比任何夢境都要絢爛。
+那個令人難忘的吻，如同完美的火花，點燃了激情的火焰。被寵愛的幸福……溫暖而酥麻的觸感傳遍全身……從彼此唇間溢出的喘息聲……前一晚他們激烈糾纏時的沈重呼吸和如雨般傾瀉的汗水——這是一段至今仍刻骨銘心的愛情。
+在她的一生中，她從未想象過這樣的關係會發生在自己身上。如果說那只是轉瞬即逝的情感，那就大錯特錯了……因為那個在舞台上彈著吉他、身材高挑修長的女人的美麗臉龐……那雙與她對視的銳利而美麗的眼睛，那濃密彎曲的眉毛，高挺的鼻梁，以及隨著旋律輕輕唱和的完美唇形……這一切都散髮著讓她無法抗拒的魅力。
+滲入血液的酒精並未影響她的清醒。這位歌手兼音樂家的魅力，並不足以輕易動搖她的心。然而，正是因為內心深處隱藏的某種情感，才讓這段關係變得深刻起來。他們不是戀人，卻在每一個情感瞬間都得到了滿足，每一絲感受中都縈繞著溫柔的氣息。每一次觸碰都溫暖得令人陶醉，幾乎讓她難以承受，然而，她卻感到……並不滿足。
+注：
+這本書講述的是Sasapin 「Jan」……來自《MY ONLY SUNSHINE》一書中Atitha 「Sun」的雙胞胎姐姐……
+但在這本書里，她們把Jan的名字改成了Luna。
+
+---------終章-------
+更多小說更新 劇更 歡迎加入抖音群505191734855，群公告自取
+`;
+
+        // 初始化
+        function init() {
+            const contentDiv = document.getElementById('novel-content');
+            const tocList = document.getElementById('toc');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const lines = rawText.split('\n');
+            let currentChapterId = '';
+            let tocHtml = '';
+            let contentHtml = '';
+
+            // 解析並構建內容
+            lines.forEach(line => {
+                
+                if (!line) return;
+
+                if (line.match(/^(第.+章|引言|注：|序章|番外|---------终章-------)/)) {
+                    // 章節標題
+                    const title = line.replace(/^- /, '');
+                    currentChapterId = 'chapter-' + Math.random().toString(36).substr(2, 9);
+                    
+                    contentHtml += `<div class="chapter" id="${currentChapterId}">
+                        <div class="chapter-title">${title}</div>
+                    </div>`;
+                    
+                    tocHtml += `<li><a href="#${currentChapterId}">${title}</a></li>`;
+                } else if (line.match(/^- /)) {
+                     // 列表項
+                     contentHtml += `<p>• ${line.substring(2)}</p>`;
+                } else {
+                    // 正文段落
+                    // 識別對話
+                    let formattedLine = line.replace(/“(.+?)”/g, '“<strong>$1</strong>”');
+                    contentHtml += `<p>${formattedLine}</p>`;
+                }
+            });
+
+            contentDiv.innerHTML = contentHtml;
+            tocList.innerHTML = tocHtml;
+
+            // 選單控制功能
+            function toggleMenu() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+
+            function closeMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
+            menuToggle.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', closeMenu);
+
+            // 點擊目錄連結後自動關閉選單（手機版體驗優化）
+            const tocLinks = document.querySelectorAll('.toc-list a');
+            tocLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        closeMenu();
+                    }
+                });
+            });
+
+            // 恢復閱讀進度
+            const savedScroll = localStorage.getItem('moonshadow_scroll');
+            if (savedScroll) {
+                window.scrollTo(0, parseInt(savedScroll));
+            }
+
+            // 設置字體大小
+            const savedFontSize = localStorage.getItem('moonshadow_fontsize');
+            if (savedFontSize) {
+                document.body.style.fontSize = savedFontSize + 'px';
+            }
+            
+            // 設置主題
+            const savedTheme = localStorage.getItem('moonshadow_theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+
+            // 綁定滾動事件
+            window.addEventListener('scroll', () => {
+                localStorage.setItem('moonshadow_scroll', window.scrollY);
+                updateActiveToc();
+            });
+        }
+
+        // 更新目錄高亮
+        function updateActiveToc() {
+            const chapters = document.querySelectorAll('.chapter');
+            let current = '';
+            
+            chapters.forEach(chapter => {
+                const chapterTop = chapter.offsetTop;
+                if (scrollY >= chapterTop - 100) {
+                    current = chapter.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.toc-list a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === '#' + current) {
+                    a.classList.add('active');
+                    // 自動滾動目錄
+                    const sidebar = document.querySelector('.sidebar');
+                    const linkTop = a.offsetTop;
+                    const sidebarHeight = sidebar.clientHeight;
+                    if (linkTop > sidebar.scrollTop + sidebarHeight - 50 || linkTop < sidebar.scrollTop) {
+                       // sidebar.scrollTo(0, linkTop - 50);
+                    }
+                }
+            });
+        }
+
+        // 交互按鈕
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            if (document.body.getAttribute('data-theme') === 'dark') {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('moonshadow_theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('moonshadow_theme', 'dark');
+            }
+        });
+
+        document.getElementById('increaseFont').addEventListener('click', () => {
+            let currentSize = parseInt(window.getComputedStyle(document.body).fontSize);
+            if (currentSize < 24) {
+                let newSize = currentSize + 1;
+                document.body.style.fontSize = newSize + 'px';
+                localStorage.setItem('moonshadow_fontsize', newSize);
+            }
+        });
+
+        document.getElementById('decreaseFont').addEventListener('click', () => {
+            let currentSize = parseInt(window.getComputedStyle(document.body).fontSize);
+            if (currentSize > 14) {
+                let newSize = currentSize - 1;
+                document.body.style.fontSize = newSize + 'px';
+                localStorage.setItem('moonshadow_fontsize', newSize);
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
