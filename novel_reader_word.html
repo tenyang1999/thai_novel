@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>月光下的陰影 - FLOWER OF MEMORY</title>
+    <title>小說閱讀器</title>
+    <!-- 引入 mammoth.js 用於讀取 Word 檔案 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         :root {
             --bg-color: #f7f1e3; /* 羊皮紙色 */
             --text-color: #2c2c2c;
-            --accent-color: #8e44ad; /* 月光紫 */
+            --light-accent: #8e44ad; /* 預設亮色主題色 */
+            --dark-accent: #a29bfe;  /* 預設暗色主題色 */
+            --accent-color: var(--light-accent);
             --sidebar-bg: #eae0c8;
             --sidebar-text: #4a4a4a;
             --font-main: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
@@ -18,7 +22,7 @@
         [data-theme="dark"] {
             --bg-color: #1a1a1a;
             --text-color: #d1d1d1;
-            --accent-color: #a29bfe;
+            --accent-color: var(--dark-accent);
             --sidebar-bg: #2d2d2d;
             --sidebar-text: #a0a0a0;
         }
@@ -124,6 +128,10 @@
             padding: 5px 10px;
             border-radius: 50%;
             color: var(--text-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn:hover {
@@ -259,6 +267,9 @@
     <div class="overlay" id="overlay"></div>
 
     <div class="controls">
+        <!-- 返回首頁書架的按鈕 -->
+        <a href="index.html" class="btn" title="返回書架">🏠</a>
+        
         <button class="btn" id="decreaseFont" title="縮小字體">A-</button>
         <button class="btn" id="increaseFont" title="放大字體">A+</button>
         <button class="btn" id="themeToggle" title="切換夜間模式">🌙</button>
@@ -273,57 +284,34 @@
         </nav>
 
         <main class="main-content" id="content-area">
-            <h1 class="book-title">月光下的陰影</h1>
-            <div class="author">作者：FLOWER OF MEMORY</div>
+            <h1 class="book-title" id="display-title">載入中...</h1>
+            <div class="author" id="display-author"></div>
             
             <!-- 小說內容開始 -->
             <div id="novel-content">
-                <!-- 內容將由 JS 注入，並進行繁簡轉換處理 -->
+                <!-- 內容將由 JS 注入 -->
             </div>
         </main>
     </div>
 
     <script>
-        // 原始文本 (包含全部內容)
-        const rawText = `
-更多小說更新 劇更 歡迎加入抖音群505191734855，群公告自取
-引言
-- 書籍：《月光下的陰影》
-- 作者：FLOWER OF MEMORY
-「你為什麼……把月亮紋在左胸上？」	
-「......」
-被問的人並未開口作答。相反，她嘴角浮現出一絲淡淡的微笑，銳利的雙眸閃爍著隱秘的含義，回望著對方。
-然而，這一切都發生在幾個小時之前……
-水流從淋浴噴頭傾瀉而下，順著閉目而立之人的白皙肌膚流淌。她將沐浴露擠在纖細的掌心，然後小心翼翼地塗抹在赤裸的身體上，動作細緻入微。那股慣常能帶來放鬆的溫柔香氣，此刻卻未能如往常般有效舒緩她的情緒。雙腿仍因疲憊而顫抖，敏感部位因前一晚的過度使用而感到刺痛，讓她彷彿剛從夢中醒來。然而，這一切都是美麗的現實，比任何夢境都要絢爛。
-那個令人難忘的吻，如同完美的火花，點燃了激情的火焰。被寵愛的幸福……溫暖而酥麻的觸感傳遍全身……從彼此唇間溢出的喘息聲……前一晚他們激烈糾纏時的沈重呼吸和如雨般傾瀉的汗水——這是一段至今仍刻骨銘心的愛情。
-在她的一生中，她從未想象過這樣的關係會發生在自己身上。如果說那只是轉瞬即逝的情感，那就大錯特錯了……因為那個在舞台上彈著吉他、身材高挑修長的女人的美麗臉龐……那雙與她對視的銳利而美麗的眼睛，那濃密彎曲的眉毛，高挺的鼻梁，以及隨著旋律輕輕唱和的完美唇形……這一切都散髮著讓她無法抗拒的魅力。
-滲入血液的酒精並未影響她的清醒。這位歌手兼音樂家的魅力，並不足以輕易動搖她的心。然而，正是因為內心深處隱藏的某種情感，才讓這段關係變得深刻起來。他們不是戀人，卻在每一個情感瞬間都得到了滿足，每一絲感受中都縈繞著溫柔的氣息。每一次觸碰都溫暖得令人陶醉，幾乎讓她難以承受，然而，她卻感到……並不滿足。
-注：
-這本書講述的是Sasapin 「Jan」……來自《MY ONLY SUNSHINE》一書中Atitha 「Sun」的雙胞胎姐姐……
-但在這本書里，她們把Jan的名字改成了Luna。
-
----------終章-------
-更多小說更新 劇更 歡迎加入抖音群505191734855，群公告自取
-`;
-
-        // 初始化
-        function init() {
+        // 負責解析文本並渲染到畫面的函數
+        function renderNovelContent(textData) {
             const contentDiv = document.getElementById('novel-content');
             const tocList = document.getElementById('toc');
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const lines = rawText.split('\n');
+            
+            // 使用正則表達式或換行符號分割文字
+            const lines = textData.split(/\r?\n/);
             let currentChapterId = '';
             let tocHtml = '';
             let contentHtml = '';
 
-            // 解析並構建內容
+            // 解析邏輯
             lines.forEach(line => {
-                
+                line = line.trim();
                 if (!line) return;
 
-                if (line.match(/^(第.+章|引言|注：|序章|番外|---------终章-------)/)) {
+                if (line.match(/^(第.+章|引言|注：|序章|番外|---------終章-------|---------终章-------)/)) {
                     // 章節標題
                     const title = line.replace(/^- /, '');
                     currentChapterId = 'chapter-' + Math.random().toString(36).substr(2, 9);
@@ -338,30 +326,17 @@
                      contentHtml += `<p>• ${line.substring(2)}</p>`;
                 } else {
                     // 正文段落
-                    // 識別對話
-                    let formattedLine = line.replace(/“(.+?)”/g, '“<strong>$1</strong>”');
+                    // 識別對話 (支援全形引號「」、“” 與一般雙引號 "" ，並將引號與內部文字一起上色)
+                    let formattedLine = line.replace(/([“「"].+?[”」"])/g, '<strong>$1</strong>');
                     contentHtml += `<p>${formattedLine}</p>`;
                 }
             });
 
+            // 注入 HTML
             contentDiv.innerHTML = contentHtml;
             tocList.innerHTML = tocHtml;
 
-            // 選單控制功能
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-
-            function closeMenu() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-
-            menuToggle.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', closeMenu);
-
-            // 點擊目錄連結後自動關閉選單（手機版體驗優化）
+            // 重新綁定目錄點擊事件 (確保手機版點擊後會關閉選單)
             const tocLinks = document.querySelectorAll('.toc-list a');
             tocLinks.forEach(link => {
                 link.addEventListener('click', () => {
@@ -371,30 +346,27 @@
                 });
             });
 
-            // 恢復閱讀進度
-            const savedScroll = localStorage.getItem('moonshadow_scroll');
-            if (savedScroll) {
-                window.scrollTo(0, parseInt(savedScroll));
-            }
-
-            // 設置字體大小
-            const savedFontSize = localStorage.getItem('moonshadow_fontsize');
-            if (savedFontSize) {
-                document.body.style.fontSize = savedFontSize + 'px';
-            }
-            
-            // 設置主題
-            const savedTheme = localStorage.getItem('moonshadow_theme');
-            if (savedTheme === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-            }
-
-            // 綁定滾動事件
-            window.addEventListener('scroll', () => {
-                localStorage.setItem('moonshadow_scroll', window.scrollY);
-                updateActiveToc();
-            });
+            // 渲染後重新計算當前目錄高亮
+            updateActiveToc();
         }
+
+        // --- 選單與 UI 控制邏輯 ---
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeMenu() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
 
         // 更新目錄高亮
         function updateActiveToc() {
@@ -412,16 +384,90 @@
                 a.classList.remove('active');
                 if (a.getAttribute('href') === '#' + current) {
                     a.classList.add('active');
-                    // 自動滾動目錄
-                    const sidebar = document.querySelector('.sidebar');
-                    const linkTop = a.offsetTop;
-                    const sidebarHeight = sidebar.clientHeight;
-                    if (linkTop > sidebar.scrollTop + sidebarHeight - 50 || linkTop < sidebar.scrollTop) {
-                       // sidebar.scrollTo(0, linkTop - 50);
-                    }
                 }
             });
         }
+
+        // --- 每本書的專屬主題顏色設定 ---
+        const bookColors = {
+            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫
+            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉
+            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘
+            "TheEarth": { light: "#12542e", dark: "##166136" },    // 大地綠
+            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍
+            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青
+            "TheFire": { light: "#c0392b", dark: "#ff7675" },      // 烈焰紅
+            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" }    // 禁忌紫
+        };
+
+        // --- 自動讀取伺服器端的 Word 檔案邏輯 (Mammoth.js) ---
+        async function loadNovelFromServer() {
+            // 從網址取得參數，例如： ?book=Moonshadow
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookParam = urlParams.get('book');
+
+            if (!bookParam) {
+                renderNovelContent("歡迎使用閱讀器！\n\n請從首頁書架點擊小說來閱讀。\n如果您是直接開啟此頁面，請在網址列加入 `?book=檔案名稱` 來指定要閱讀的小說。\n例如：`.../novel_reader_word.html?book=Moonshadow`");
+                document.getElementById('display-title').textContent = "請指定書籍";
+                return;
+            }
+
+            // --- 套用專屬顏色 ---
+            if (bookColors[bookParam]) {
+                document.documentElement.style.setProperty('--light-accent', bookColors[bookParam].light);
+                document.documentElement.style.setProperty('--dark-accent', bookColors[bookParam].dark);
+            }
+
+            // 動態替換網頁標題與大標題
+            document.getElementById('display-title').textContent = bookParam;
+            document.getElementById('display-author').textContent = ""; // 如果需要作者，可以在這裡擴充設定
+            document.title = bookParam + " - 小說閱讀器";
+
+            // 設定路徑為 novel 資料夾下的該檔案 (不用加附檔名，程式自動補上 .docx)
+            const docxPath = `./novel/${bookParam}.docx`; 
+
+            try {
+                // 使用 fetch API 取得後端的檔案
+                const response = await fetch(docxPath);
+                if (!response.ok) throw new Error('無法取得檔案，可能是檔名或路徑錯誤');
+                
+                const arrayBuffer = await response.arrayBuffer();
+                
+                // 使用 mammoth 提取純文字
+                mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                    .then(function(result) {
+                        const text = result.value;
+                        // 將解析出的純文字渲染到畫面上
+                        renderNovelContent(text);
+                        
+                        // 恢復該本書的閱讀進度
+                        const savedScroll = localStorage.getItem(`moonshadow_scroll_${bookParam}`);
+                        if (savedScroll) {
+                            window.scrollTo(0, parseInt(savedScroll));
+                        } else {
+                            window.scrollTo(0, 0);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error("Mammoth 解析錯誤:", err);
+                        renderNovelContent("解析 Word 檔案失敗，請確保檔案格式為正確的 .docx 且沒有損毀。");
+                    });
+            } catch (error) {
+                console.error("取得檔案失敗:", error);
+                // 如果找不到檔案，退回顯示提示文字
+                renderNovelContent(`找不到檔案：${docxPath} \n請確認 novel 資料夾內是否有此檔案，並確認伺服器有正確啟動。`);
+            }
+        }
+
+        // 綁定滾動事件 (儲存進度時加上書名，避免不同書互相覆蓋)
+        window.addEventListener('scroll', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookParam = urlParams.get('book');
+            if (bookParam) {
+                localStorage.setItem(`moonshadow_scroll_${bookParam}`, window.scrollY);
+            }
+            updateActiveToc();
+        });
 
         // 交互按鈕
         document.getElementById('themeToggle').addEventListener('click', () => {
@@ -451,6 +497,24 @@
                 localStorage.setItem('moonshadow_fontsize', newSize);
             }
         });
+
+        // 初始化執行
+        function init() {
+            // 啟動時自動載入伺服器上的 Word 檔案
+            loadNovelFromServer();
+
+            // 設置字體大小
+            const savedFontSize = localStorage.getItem('moonshadow_fontsize');
+            if (savedFontSize) {
+                document.body.style.fontSize = savedFontSize + 'px';
+            }
+            
+            // 設置主題
+            const savedTheme = localStorage.getItem('moonshadow_theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        }
 
         init();
     </script>
