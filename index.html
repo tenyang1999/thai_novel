@@ -143,90 +143,66 @@
         <h1>泰百小說</h1>
     </header>
 
-    <div class="bookshelf">
+    <!-- 原本寫死的 HTML 都移除了，改由下方 JavaScript 自動生成到這個容器裡 -->
+    <div class="bookshelf" id="bookshelf"></div>
+
+    <script>
+        // ==========================================
+        // 📚 小說清單設定區
+        // ==========================================
+        // 未來如果有新增小說，只需要在這裡新增一筆資料即可！
+        // id: 對應 novel_reader_word.html?book= 後面的參數
+        // title: 顯示在卡片上的書名
+        // cover: 封面圖片的檔名 (請注意副檔名是 .jpg 還是 .png)
         
-        <!-- 將 href 改為指向閱讀器並帶上 book 參數 -->
-        <a href="novel_reader_word.html?book=Moonshadow" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_moonshadow.jpg" alt="Moonshadow 封面"> 
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">Moonshadow</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
+        const novelList = [
+            { id: "Moonshadow",   title: "Moonshadow",    cover: "cover_moonshadow.jpg" },
+            { id: "Ditto",        title: "Ditto",         cover: "cover_ditto.jpg" },
+            { id: "Dreamwedding", title: "Dream Wedding", cover: "cover_dreamwedding.jpg" },
+            { id: "TheEarth",     title: "The Earth",     cover: "cover_theearth.jpg" },
+            { id: "TheWater",     title: "The Water",     cover: "cover_thewater.jpg" },
+            { id: "TheWind",      title: "The Wind",      cover: "cover_thewind.png" }, // 注意這張是 png
+            { id: "TheFire",      title: "The Fire",      cover: "cover_thefire.jpg" },
+            { id: "DeniedLove",   title: "Denied Love",   cover: "cover_deniedlove.jpg" },
+            { id: "Affair",       title: "Affair",        cover: "cover_affair.jpg" },
+            { id: "ChasingLove",       title: "Chasing Love",        cover: "cover_chasinglove.jpg" },
+            { id: "Cranium",       title: "Cranium",        cover: "cover_cranium.jpg" },
+            { id: "EnemieswithBenefits",       title: "Enemies with Benefits",        cover: "cover_enemieswithbenefits.jpg" },
+            { id: "GirlRules",       title: "Girl Rules",        cover: "cover_girlrules.jpg" },
+            { id: "HometownRomance",       title: "Hometown Romance",        cover: "cover_hometownromance.jpg" },
+            { id: "PoisonousLove",       title: "Poisonous Love",        cover: "cover_poisonouslove.jpg" },
+            { id: "Us",       title: "Us",        cover: "cover_us.jpg" },
+            { id: "4Elements_special", title: "4 Elements Special", cover: "cover_4elements_special.jpg" },
 
-        <a href="novel_reader_word.html?book=Ditto" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_ditto.jpg" alt="Ditto 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">Ditto</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
+        ];
 
-        <a href="novel_reader_word.html?book=Dreamwedding" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_dreamwedding.jpg" alt="Dreamwedding 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">Dream Wedding</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
+        // ==========================================
+        // ⚙️ 自動生成卡片程式碼
+        // ==========================================
+        const bookshelf = document.getElementById('bookshelf');
 
-        <a href="novel_reader_word.html?book=TheEarth" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_theearth.jpg" alt="The Earth 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">The Earth</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
+        // 遍歷小說清單，自動產生 HTML
+        novelList.forEach(book => {
+            // 建立 <a> 標籤
+            const card = document.createElement('a');
+            card.href = `novel_reader_word.html?book=${book.id}`;
+            card.className = 'book-card';
 
-        <a href="novel_reader_word.html?book=TheWater" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_thewater.jpg" alt="The Water 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">The Water</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
+            // 填入內部 HTML 結構
+            // 加入了 onerror 處理，如果圖片尚未準備好，可以避免顯示破圖圖示
+            card.innerHTML = `
+                <div class="cover-container">
+                    <img src="cover/${book.cover}" alt="${book.title} 封面" onerror="this.style.display='none'"> 
+                </div>
+                <div class="book-info">
+                    <h2 class="book-title">${book.title}</h2>
+                    <div class="read-btn">開始閱讀</div>
+                </div>
+            `;
 
-        <a href="novel_reader_word.html?book=TheWind" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_thewind.png" alt="The Wind 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">The Wind</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
-
-        <a href="novel_reader_word.html?book=TheFire" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_thefire.jpg" alt="The Fire 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">The Fire</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
-
-
-        <a href="novel_reader_word.html?book=DeniedLove" class="book-card">
-            <div class="cover-container">
-                <img src="cover/cover_deniedlove.jpg" alt="Denied Love 封面">
-            </div>
-            <div class="book-info">
-                <h2 class="book-title">Denied Love</h2>
-                <div class="read-btn">開始閱讀</div>
-            </div>
-        </a>
-    </div>
-
+            // 將卡片放入書架中
+            bookshelf.appendChild(card);
+        });
+    </script>
 </body>
 </html>
