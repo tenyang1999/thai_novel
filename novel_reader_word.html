@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小說閱讀器</title>
-    <!-- 引入 mammoth.js 用於讀取 Word 檔案 -->
+    <!-- 引入 mammoth.js 用於讀取 Word 檔案 (已取消註解) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         :root {
@@ -311,7 +311,7 @@
                 line = line.trim();
                 if (!line) return;
 
-                if (line.match(/^(第.+章|引言|注：|序章|番外|---------終章-------|---------终章-------)/)) {
+                if (line.match(/^(第.+章|引言|注：|序章|番外|##|第.+集|Ep.|尾聲|---------終章-------|---------终章-------)/)) {
                     // 章節標題
                     const title = line.replace(/^- /, '');
                     currentChapterId = 'chapter-' + Math.random().toString(36).substr(2, 9);
@@ -390,24 +390,34 @@
 
         // --- 每本書的專屬主題顏色設定 ---
         const bookColors = {
-            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫
-            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉
-            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘
-            "TheEarth": { light: "#12542e", dark: "##166136" },    // 大地綠
-            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍
-            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青
-            "TheFire": { light: "#c0392b", dark: "#ff7675" },      // 烈焰紅
-            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" }    // 禁忌紫
+            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
+            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
+            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
+            "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
+            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
+            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
+            "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
+            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
+            // 以下為新增的小說配色
+            "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
+            "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
+            "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
+            "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
+            "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
+            "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
+            "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
+            "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
+            "4Elements_special": { light: "#f39c12", dark: "#f1c40f" } // 元素幻金
         };
 
-        // --- 自動讀取伺服器端的 Word 檔案邏輯 (Mammoth.js) ---
+        // --- 自動讀取伺服器端的 txt 或是 docx 檔案 ---
         async function loadNovelFromServer() {
             // 從網址取得參數，例如： ?book=Moonshadow
             const urlParams = new URLSearchParams(window.location.search);
             const bookParam = urlParams.get('book');
 
             if (!bookParam) {
-                renderNovelContent("歡迎使用閱讀器！\n\n請從首頁書架點擊小說來閱讀。\n如果您是直接開啟此頁面，請在網址列加入 `?book=檔案名稱` 來指定要閱讀的小說。\n例如：`.../novel_reader_word.html?book=Moonshadow`");
+                renderNovelContent("歡迎使用閱讀器！\n\n請從首頁書架點擊小說來閱讀。\n如果您是直接開啟此頁面，請在網址列加入 `?book=檔案名稱` (不含副檔名) 來指定要閱讀的小說。\n例如：`.../novel_reader.html?book=Moonshadow`");
                 document.getElementById('display-title').textContent = "請指定書籍";
                 return;
             }
@@ -420,42 +430,55 @@
 
             // 動態替換網頁標題與大標題
             document.getElementById('display-title').textContent = bookParam;
-            document.getElementById('display-author').textContent = ""; // 如果需要作者，可以在這裡擴充設定
+            document.getElementById('display-author').textContent = ""; 
             document.title = bookParam + " - 小說閱讀器";
 
-            // 設定路徑為 novel 資料夾下的該檔案 (不用加附檔名，程式自動補上 .txt)
-            const txtPath = `./novel/${bookParam}.txt`; 
+            let textContent = "";
 
             try {
-                // 使用 fetch API 取得後端的檔案
-                const response = await fetch(txtPath);
-                if (!response.ok) throw new Error('無法取得檔案，可能是檔名或路徑錯誤');
+                // 1. 先嘗試抓取 .txt 檔案
+                const txtResponse = await fetch(`./novel/${bookParam}.txt`);
                 
-                const arrayBuffer = await response.arrayBuffer();
+                if (txtResponse.ok) {
+                    // 找到 txt，直接讀取文字
+                    textContent = await txtResponse.text();
+                    console.log("成功讀取 .txt 檔案");
+                } else {
+                    // 2. 如果 txt 找不到，則嘗試抓取 .docx 檔案
+                    console.log("找不到 .txt，嘗試讀取 .docx 檔案...");
+                    const docxResponse = await fetch(`./novel/${bookParam}.docx`);
+                    
+                    if (docxResponse.ok) {
+                        // 找到 docx，轉成 arrayBuffer 後交給 mammoth 解析
+                        const arrayBuffer = await docxResponse.arrayBuffer();
+                        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                        textContent = result.value;
+                        console.log("成功讀取並解析 .docx 檔案");
+                    } else {
+                        // 兩種檔案都找不到
+                        throw new Error('找不到對應的檔案');
+                    }
+                }
+
+                // 渲染讀取到的文字
+                renderNovelContent(textContent);
                 
-                // 使用 mammoth 提取純文字
-                mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-                    .then(function(result) {
-                        const text = result.value;
-                        // 將解析出的純文字渲染到畫面上
-                        renderNovelContent(text);
-                        
-                        // 恢復該本書的閱讀進度
-                        const savedScroll = localStorage.getItem(`moonshadow_scroll_${bookParam}`);
-                        if (savedScroll) {
-                            window.scrollTo(0, parseInt(savedScroll));
-                        } else {
-                            window.scrollTo(0, 0);
-                        }
-                    })
-                    .catch(function(err) {
-                        console.error("Mammoth 解析錯誤:", err);
-                        renderNovelContent("解析 Word 檔案失敗，請確保檔案格式為正確的 .txt 且沒有損毀。");
-                    });
+                // 恢復該本書的閱讀進度
+                const savedScroll = localStorage.getItem(`moonshadow_scroll_${bookParam}`);
+                if (savedScroll) {
+                    // 給一點時間讓 DOM 更新高度後再滾動
+                    setTimeout(() => {
+                        window.scrollTo(0, parseInt(savedScroll));
+                        updateActiveToc();
+                    }, 100);
+                } else {
+                    window.scrollTo(0, 0);
+                }
+
             } catch (error) {
                 console.error("取得檔案失敗:", error);
-                // 如果找不到檔案，退回顯示提示文字
-                renderNovelContent(`找不到檔案：${txtPath} \n請確認 novel 資料夾內是否有此檔案，並確認伺服器有正確啟動。`);
+                // 如果找不到檔案，顯示提示文字
+                renderNovelContent(`載入失敗：無法找到名為「${bookParam}.txt」或「${bookParam}.docx」的檔案。\n\n請確認：\n1. novel 資料夾內有對應名稱的文字檔或 Word 檔。\n2. 伺服器 (Live Server 等) 有正確啟動。`);
             }
         }
 
@@ -500,7 +523,7 @@
 
         // 初始化執行
         function init() {
-            // 啟動時自動載入伺服器上的 Word 檔案
+            // 啟動時自動載入伺服器上的 txt 或 Word 檔案
             loadNovelFromServer();
 
             // 設置字體大小

@@ -8,7 +8,7 @@
         :root {
             --bg-color: #f7f1e3; /* 羊皮紙背景色 */
             --text-color: #2c2c2c;
-            --accent-color: #8e44ad; /* 裝飾色 */
+            --accent-color: #8e44ad; /* 預設裝飾色 */
             --card-bg: #fffbf0;
             --shadow: 0 4px 15px rgba(0,0,0,0.1);
             --font-main: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
@@ -111,7 +111,7 @@
             font-size: 1.5rem;
             margin: 0 0 15px 0;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--accent-color); /* 將會吃個別卡片覆蓋的顏色 */
         }
 
         .read-btn {
@@ -150,31 +150,49 @@
         // ==========================================
         // 📚 小說清單設定區
         // ==========================================
-        // 未來如果有新增小說，只需要在這裡新增一筆資料即可！
-        // id: 對應 novel_reader_word.html?book= 後面的參數
-        // title: 顯示在卡片上的書名
-        // cover: 封面圖片的檔名 (請注意副檔名是 .jpg 還是 .png)
-        
         const novelList = [
-            { id: "Moonshadow",   title: "Moonshadow",    cover: "cover_moonshadow.jpg" },
-            { id: "Ditto",        title: "Ditto",         cover: "cover_ditto.jpg" },
-            { id: "Dreamwedding", title: "Dream Wedding", cover: "cover_dreamwedding.jpg" },
-            { id: "TheEarth",     title: "The Earth",     cover: "cover_theearth.jpg" },
-            { id: "TheWater",     title: "The Water",     cover: "cover_thewater.jpg" },
-            { id: "TheWind",      title: "The Wind",      cover: "cover_thewind.png" }, // 注意這張是 png
-            { id: "TheFire",      title: "The Fire",      cover: "cover_thefire.jpg" },
-            { id: "DeniedLove",   title: "Denied Love",   cover: "cover_deniedlove.jpg" },
-            { id: "Affair",       title: "Affair",        cover: "cover_affair.jpg" },
-            { id: "ChasingLove",       title: "Chasing Love",        cover: "cover_chasinglove.jpg" },
-            { id: "Cranium",       title: "Cranium",        cover: "cover_cranium.jpg" },
-            { id: "EnemieswithBenefits",       title: "Enemies with Benefits",        cover: "cover_enemieswithbenefits.jpg" },
-            { id: "GirlRules",       title: "Girl Rules",        cover: "cover_girlrules.jpg" },
-            { id: "HometownRomance",       title: "Hometown Romance",        cover: "cover_hometownromance.jpg" },
-            { id: "PoisonousLove",       title: "Poisonous Love",        cover: "cover_poisonouslove.jpg" },
-            { id: "Us",       title: "Us",        cover: "cover_us.jpg" },
-            { id: "4Elements_special", title: "4 Elements Special", cover: "cover_4elements_special.jpg" },
-
+            { id: "Moonshadow",        title: "Moonshadow",            cover: "cover_moonshadow.jpg" },
+            { id: "Ditto",             title: "Ditto",                 cover: "cover_ditto.jpg" },
+            { id: "Dreamwedding",      title: "Dream Wedding",         cover: "cover_dreamwedding.jpg" },
+            { id: "TheEarth",          title: "The Earth",             cover: "cover_theearth.jpg" },
+            { id: "TheWater",          title: "The Water",             cover: "cover_thewater.jpg" },
+            { id: "TheWind",           title: "The Wind",              cover: "cover_thewind.png" }, // 注意這張是 png
+            { id: "TheFire",           title: "The Fire",              cover: "cover_thefire.jpg" },
+            { id: "DeniedLove",        title: "Denied Love",           cover: "cover_deniedlove.jpg" },
+            { id: "Affair",            title: "Affair",                cover: "cover_affair.jpg" },
+            { id: "ChasingLove",       title: "Chasing Love",          cover: "cover_chasinglove.jpg" },
+            { id: "Cranium",           title: "Cranium",               cover: "cover_cranium.jpg" },
+            { id: "EnemieswithBenefits", title: "Enemies with Benefits", cover: "cover_enemieswithbenefits.jpg" },
+            { id: "GirlRules",         title: "Girl Rules",            cover: "cover_girlrules.jpg" },
+            { id: "HometownRomance",   title: "Hometown Romance",      cover: "cover_hometownromance.jpg" },
+            { id: "PoisonousLove",     title: "Poisonous Love",        cover: "cover_poisonouslove.jpg" },
+            { id: "Us",                title: "Us",                    cover: "cover_us.jpg" },
+            { id: "4Elements_special", title: "4 Elements Special",    cover: "cover_4elements_special.jpg" }
         ];
+
+        // ==========================================
+        // 🎨 書籍專屬顏色設定區
+        // ==========================================
+        const bookColors = {
+            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
+            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
+            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
+            "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
+            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
+            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
+            "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
+            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
+            // 以下為新增的小說配色
+            "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
+            "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
+            "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
+            "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
+            "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
+            "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
+            "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
+            "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
+            "4Elements_special": { light: "#f39c12", dark: "#f1c40f" } // 元素幻金
+        };
 
         // ==========================================
         // ⚙️ 自動生成卡片程式碼
@@ -187,6 +205,12 @@
             const card = document.createElement('a');
             card.href = `novel_reader_word.html?book=${book.id}`;
             card.className = 'book-card';
+            
+            // 讀取這本書的顏色（如果忘記設定，就預設使用主要的紫色 #8e44ad）
+            const customColor = bookColors[book.id] ? bookColors[book.id].light : '#8e44ad';
+            
+            // 將自訂顏色覆蓋到這張卡片的 CSS 變數中
+            card.style.setProperty('--accent-color', customColor);
 
             // 填入內部 HTML 結構
             // 加入了 onerror 處理，如果圖片尚未準備好，可以避免顯示破圖圖示
