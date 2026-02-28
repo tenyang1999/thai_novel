@@ -311,7 +311,7 @@
                 line = line.trim();
                 if (!line) return;
 
-                if (line.match(/^(第.+章|引言|注：|序章|番外|##|第.+集|Ep.|尾聲|---------終章-------|---------终章-------)/)) {
+                if (line.match(/^(第.+章|引言|注：|序章|番外|##|第.+集|Ep.|尾聲|前言|序言|Special|特別篇|---------終章-------|---------终章-------)/)) {
                     // 章節標題
                     const title = line.replace(/^- /, '');
                     currentChapterId = 'chapter-' + Math.random().toString(36).substr(2, 9);
