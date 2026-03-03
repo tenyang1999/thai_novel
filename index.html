@@ -174,30 +174,30 @@
             
         ];
 
-        // ==========================================
-        // 🎨 書籍專屬顏色設定區
-        // ==========================================
-        const bookColors = {
-            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
-            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
-            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
-            "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
-            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
-            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
-            "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
-            "4Elements_special": { light: "#f39c12", dark: "#f1c40f" }, // 元素幻金
-            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
-            "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
-            "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
-            "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
-            "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
-            "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
-            "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
-            "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
-            "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
+        // // ==========================================
+        // // 🎨 書籍專屬顏色設定區
+        // // ==========================================
+        // const bookColors = {
+        //     "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
+        //     "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
+        //     "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
+        //     "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
+        //     "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
+        //     "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
+        //     "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
+        //     "4Elements_special": { light: "#f39c12", dark: "#f1c40f" }, // 元素幻金
+        //     "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
+        //     "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
+        //     "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
+        //     "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
+        //     "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
+        //     "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
+        //     "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
+        //     "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
+        //     "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
 
             
-        };
+        // };
 
         // ==========================================
         // ⚙️ 自動生成卡片程式碼
@@ -212,10 +212,10 @@
             card.className = 'book-card';
             
             // 讀取這本書的顏色（如果忘記設定，就預設使用主要的紫色 #8e44ad）
-            const customColor = bookColors[book.id] ? bookColors[book.id].light : '#8e44ad';
+            // const customColor = bookColors[book.id] ? bookColors[book.id].light : '#8e44ad';
             
             // 將自訂顏色覆蓋到這張卡片的 CSS 變數中
-            card.style.setProperty('--accent-color', customColor);
+            // card.style.setProperty('--accent-color', customColor);
 
             // 填入內部 HTML 結構
             // 加入了 onerror 處理，如果圖片尚未準備好，可以避免顯示破圖圖示

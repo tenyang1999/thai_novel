@@ -10,8 +10,8 @@
         :root {
             --bg-color: #f7f1e3; /* 羊皮紙色 */
             --text-color: #2c2c2c;
-            --light-accent: #8e44ad; /* 預設亮色主題色 */
-            --dark-accent: #a29bfe;  /* 預設暗色主題色 */
+            --light-accent: #8629af; /* 預設亮色主題色 */
+            --dark-accent: #ed9bfe;  /* 預設暗色主題色 */
             --accent-color: var(--light-accent);
             --sidebar-bg: #eae0c8;
             --sidebar-text: #4a4a4a;
@@ -388,27 +388,26 @@
             });
         }
 
-        // --- 每本書的專屬主題顏色設定 ---
-        const bookColors = {
-            "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
-            "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
-            "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
-            "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
-            "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
-            "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
-            "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
-            "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
-            // 以下為新增的小說配色
-            "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
-            "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
-            "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
-            "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
-            "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
-            "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
-            "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
-            "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
-            "4Elements_special": { light: "#f39c12", dark: "#f1c40f" } // 元素幻金
-        };
+        // // --- 每本書的專屬主題顏色設定 ---
+        // const bookColors = {
+        //     "Moonshadow": { light: "#8e44ad", dark: "#a29bfe" },  // 月光紫 (原設定)
+        //     "Ditto": { light: "#b53573", dark: "#fd79a8" },       // 櫻花粉 (原設定)
+        //     "Dreamwedding": { light: "#d35400", dark: "#e67e22" },// 浪漫橘 (原設定)
+        //     "TheEarth": { light: "#12542e", dark: "#166136" },    // 大地綠 (原設定，修正多餘 #)
+        //     "TheWater": { light: "#055796", dark: "#74b9ff" },    // 海洋藍 (原設定)
+        //     "TheWind": { light: "#008f73", dark: "#55efc4" },     // 微風青 (原設定)
+        //     "TheFire": { light: "#c0392b", dark: "#ff7675" },     // 烈焰紅 (原設定)
+        //     "DeniedLove": { light: "#4132b8", dark: "#a29bfe" },  // 禁忌紫 (原設定)
+        //     "Affair": { light: "#833471", dark: "#b53471" },      // 魅惑紫紅
+        //     "ChasingLove": { light: "#e17055", dark: "#fab1a0" }, // 追逐暖橘
+        //     "Cranium": { light: "#2d3436", dark: "#636e72" },     // 謎團深灰
+        //     "EnemieswithBenefits": { light: "#6c5ce7", dark: "#a29bfe" }, // 衝突藍紫
+        //     "GirlRules": { light: "#e84393", dark: "#fd79a8" },   // 女力桃紅
+        //     "HometownRomance": { light: "#b9732f", dark: "#e1b12c" }, // 故鄉暖棕
+        //     "PoisonousLove": { light: "#009432", dark: "#a3cb38" },// 劇毒青綠
+        //     "Us": { light: "#192a56", dark: "#273c75" },          // 羈絆深藍
+        //     "4Elements_special": { light: "#f39c12", dark: "#f1c40f" } // 元素幻金
+        // };
 
         // --- 自動讀取伺服器端的 txt 或是 docx 檔案 ---
         async function loadNovelFromServer() {
@@ -423,10 +422,10 @@
             }
 
             // --- 套用專屬顏色 ---
-            if (bookColors[bookParam]) {
-                document.documentElement.style.setProperty('--light-accent', bookColors[bookParam].light);
-                document.documentElement.style.setProperty('--dark-accent', bookColors[bookParam].dark);
-            }
+            // if (bookColors[bookParam]) {
+            //     document.documentElement.style.setProperty('--light-accent', bookColors[bookParam].light);
+            //     document.documentElement.style.setProperty('--dark-accent', bookColors[bookParam].dark);
+            // }
 
             // 動態替換網頁標題與大標題
             document.getElementById('display-title').textContent = bookParam;
